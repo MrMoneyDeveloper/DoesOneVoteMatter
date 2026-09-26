@@ -10,16 +10,17 @@
 - [x] Regional and compensatory baseline reproduction for 2004–2024: 1,638 regional cells; 50,960 eligible one-ballot regional checks.
 - [x] One-vote addition/abstention/switching and collective counterfactual controls.
 - [x] Exact vote-share majority thresholds.
-- [x] Bounded ANC national entitlement-change searches with unresolved ties explicit.
+- [x] Bounded ANC national threshold searches with unresolved ties explicit, separating any-vector change from selected-party seat change.
 - [x] Historical SD, swings, retrospective holdout, province comparisons.
 - [x] React, Bootstrap, GSAP, ECharts; CSV/JSON download and provenance inspector.
 - [x] Cloudflare Workers Static Assets build and deployment dry run.
+- [x] GitHub Actions verification workflow; Cloudflare deployment workflow gated on repository credentials.
 
 ## Outstanding: complete electoral-impact engine
 
 - [ ] 1994/1999 regional fixtures; candidate availability, forfeitures, overhang redistribution, independent wins and adjudicated ties. Regional and compensatory baselines for 2004–2024 now pass independently.
 - [ ] Region-specific perturbations; directed party-to-party minimum thresholds for every party.
-- [ ] Full MEVP-seat, MEVP-majority and largest-party searches with proof of minimality.
+- [ ] Full directed MEVP-seat, selected-party gain/loss, MEVP-majority and largest-party searches across every party pair, with proof of minimality. The engine now supports these criteria; exhaustive all-party mapping remains outstanding.
 - [ ] Explicit integer distribution rule for proportional opposition swings; candidate-list fixtures for every supported election.
 
 Acceptance: reproduce regional, compensatory and total seats separately; validate edge cases against published rules and independent examples; never infer broad correctness from matching national aggregates alone.

@@ -31,6 +31,20 @@ def allocation_votes(election):
     return {p["party"]: p["votes"] + p.get("regionalVotes",0) for p in election["parties"]}
 
 
+def seat_deltas(baseline, changed):
+    """Compact, explicit explanation of which entitlements moved."""
+    return [
+        {
+            "party": party,
+            "before": baseline[party],
+            "after": changed[party],
+            "delta": changed[party] - baseline[party],
+        }
+        for party in baseline
+        if baseline[party] != changed[party]
+    ]
+
+
 def build():
     manifest = validate_sources()
     data = elections()
@@ -75,25 +89,79 @@ def build():
                     changed = None
                 pivotality.append({"year":y,"party":party,"action":action,"k":1,"shareChangePP":(altered[party]/sum(altered.values())-national[party]/sum(national.values()))*100,"entitlementChanged":changed,"ballot":"national"})
         shares = [p["votes"]/e["voteTotal"] for p in e["parties"]]
-        e["metrics"] = {"effectiveParties":1/sum(s*s for s in shares),"concentration":sum(s*s for s in shares),"oneBallotWeightPP":100/e["voteTotal"]}
+        e["metrics"] = {
+            "effectiveParties":1/sum(s*s for s in shares),
+            "concentration":sum(s*s for s in shares),
+            "oneBallotWeightPP":100/e["voteTotal"],
+            "smoothSeatEquivalent":400/e["voteTotal"],
+            "averageBallotsPerSeat":e["voteTotal"]/400,
+        }
         anc = next(p for p in e["parties"] if p["party"] in ("ANC","AFRICAN NATIONAL CONGRESS"))
         e["anc"] = {"share":anc["share"],"votes":anc["votes"],"seats":anc["officialSeats"],"belowHalf":{m:below_half_threshold(national,anc["party"],m) for m in ["switch","opposition_add","abstain"]}}
     training = [e["anc"]["share"] for e in data if e["year"]<=2019]
     mean, sd = statistics.mean(training), statistics.stdev(training)
     swings = [{"from":a["year"],"to":b["year"],"changePP":b["anc"]["share"]-a["anc"]["share"],"annualisedPP":(b["anc"]["share"]-a["anc"]["share"])/(b["year"]-a["year"])} for a,b in zip(data,data[1:])]
     history = {"trainingYears":[1994,1999,2004,2009,2014,2019],"n":6,"mean":mean,"sampleSD":sd,"thresholdDistanceSD":(mean-50)/sd,"holdoutYear":2024,"holdoutShare":data[-1]["anc"]["share"],"holdoutDistanceSD":(data[-1]["anc"]["share"]-mean)/sd,"swings":swings,"interpretation":"Descriptive historical distance; not a probability, significance test or election forecast. 2024 was already known when this retrospective split was specified."}
-    # Limit searches to the single-ballot system. These are national entitlement
-    # boundaries, not proof of a candidate-assignment or local outcome threshold.
+    # Bound expensive retrospective searches. These are entitlement boundaries,
+    # not proof of candidate assignment, local outcomes, or future pivotality.
     thresholds = []
     for e in data:
         if e["year"] == 2024:
             continue
         votes = allocation_votes(e)
+        baseline = allocate(votes)
         anc = next(p for p in votes if p in ("ANC","AFRICAN NATIONAL CONGRESS"))
         for action in ["add","abstain"]:
-            found = first_change(votes,anc,mechanism=action,limit=50000)
-            thresholds.append({"year":e["year"],"party":anc,"action":action,"scope":"first change in any national entitlement",**found})
-    bundle = {"schemaVersion":1,"elections":data,"history":history,"validation":validation,"regionalValidation":regional_validation,"pivotality":pivotality,"switchChecks":switch_checks,"thresholds":thresholds,"sources":manifest["files"],"limitations":["Browser simulations use national entitlements; candidate-list exhaustion, regional overhang, and independent-winning counterfactuals are not implemented.","Regional and compensatory baselines are independently reproduced for 2004-2024; 1994/1999 regional fixtures remain outstanding.","2024 simulations change only the national ballot and hold regional votes fixed.","Socioeconomic data and boundary crosswalks are not yet ingested; no correlations or causal claims are published."]}
+            for criterion, metric in [
+                ("vector", "first_entitlement_vector_change"),
+                ("party_change", "first_selected_party_seat_change"),
+            ]:
+                found = first_change(
+                    votes,
+                    anc,
+                    mechanism=action,
+                    limit=50000,
+                    criterion=criterion,
+                )
+                record = {
+                    "year":e["year"],
+                    "party":anc,
+                    "action":action,
+                    "metric":metric,
+                    "scope":(
+                        "first change anywhere in the national entitlement vector"
+                        if criterion == "vector"
+                        else "first change in the selected party national entitlement"
+                    ),
+                    **found,
+                }
+                if found.get("seats") is not None:
+                    record["changes"] = seat_deltas(baseline, found["seats"])
+                    record["selectedPartyDelta"] = found["seats"][anc] - baseline[anc]
+                thresholds.append(record)
+    bundle = {
+        "schemaVersion":2,
+        "analysisUnit":"counted ballot",
+        "terminology":{
+            "oneVoteMeaning":"Unless explicitly labelled voter-level, one vote in this report means one counted ballot.",
+            "voterBallotDistinction":"A voter and a ballot are not always interchangeable. In 2024 a voter could cast multiple ballots, while the current national counterfactual engine perturbs one counted national ballot at a time.",
+        },
+        "elections":data,
+        "history":history,
+        "validation":validation,
+        "regionalValidation":regional_validation,
+        "pivotality":pivotality,
+        "switchChecks":switch_checks,
+        "thresholds":thresholds,
+        "sources":manifest["files"],
+        "limitations":[
+            "Browser simulations use national entitlements; candidate-list exhaustion, regional overhang, and independent-winning counterfactuals are not implemented.",
+            "Regional and compensatory baselines are independently reproduced for 2004-2024; 1994/1999 regional fixtures remain outstanding.",
+            "2024 simulations change only one national ballot and hold regional votes fixed; this is not yet a complete voter-level 2024 simulation.",
+            "Minimum-threshold outputs distinguish the first change anywhere in the entitlement vector from the first seat change of the selected party.",
+            "Socioeconomic data and boundary crosswalks are not yet ingested; no correlations or causal claims are published.",
+        ],
+    }
     output = ROOT / "data/processed"
     output.mkdir(parents=True,exist_ok=True)
     public = ROOT / "public/data"

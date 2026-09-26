@@ -380,6 +380,11 @@ function App({ report }: { report: Report }) {
                     ? "One ballot changes the tally. Whether it changes representation is a different question. Explore the numbers behind South Africa’s national elections."
                     : "Change the number of ballots, hold the scenario explicit, and see how a historical national vote distribution responds."}
                 </p>
+                <small>
+                  Throughout this report, “one vote” means one counted ballot
+                  unless a voter-level scenario is explicitly labelled. In
+                  2024, one voter could cast multiple ballots.
+                </small>
               </div>
               <aside className="hero-aside">
                 <span className="mini-label">
@@ -573,6 +578,14 @@ function App({ report }: { report: Report }) {
                     <b>{fixed(100 / e.voteTotal, 7)} percentage points</b> of
                     the valid national vote. Its exact marginal effect also
                     depends on which tally and denominator change.
+                  </p>
+                  <p>
+                    A smooth 400-seat proportional average is{" "}
+                    <b>{fixed(e.metrics.smoothSeatEquivalent, 8)} seats per ballot</b>,
+                    equivalent to about{" "}
+                    <b>{number(Math.round(e.metrics.averageBallotsPerSeat))} ballots per seat</b>.
+                    Actual seats are discrete, so the realised marginal seat
+                    effect remains zero until an allocation boundary is crossed.
                   </p>
                   <button
                     className="solid-button"
@@ -818,23 +831,22 @@ function App({ report }: { report: Report }) {
                       model. None is estimated here.
                     </li>
                   </ol>
-                  <h3>A hypothesis that can be challenged</h3>
+                  <h3>A historical test that can be challenged</h3>
                   <p>
-                    Initial hypothesis: individual ballots have small national
-                    outcome leverage under observed historical margins.
-                    Single-ballot entitlement changes or consistently small
-                    verified thresholds would weaken that hypothesis. Large
-                    thresholds in these cases would support a narrow historical
-                    observation, not establish a future pivotality probability.
+                    The narrow test is whether a one-ballot perturbation crosses
+                    a national entitlement boundary in the realised historical
+                    results. A verified seat change is a counterexample. No
+                    future pivotality probability is estimated from these
+                    deterministic counterfactuals.
                   </p>
                   <h3>Minimum thresholds are bounded searches</h3>
                   <p>
                     The pipeline checks every integer k, in order, up to 50,000
                     for ANC additions and abstentions before 2024. It stops at
                     an unresolved tie. A result not found within a bound is not
-                    proof that change is impossible. These thresholds concern
-                    any national entitlement change, and depend on the chosen
-                    mechanism.
+                    proof that change is impossible. Crucially, the report now
+                    separates the first change anywhere in the entitlement
+                    vector from the first seat change of the selected party.
                   </p>
                 </article>
               </div>
@@ -962,21 +974,35 @@ function App({ report }: { report: Report }) {
                       <tr>
                         <th>Election</th>
                         <th>ANC action</th>
-                        <th>First entitlement change</th>
+                        <th>Threshold metric</th>
+                        <th>First change</th>
+                        <th>Selected-party Δ</th>
                         <th>Checked through</th>
                       </tr>
                     </thead>
                     <tbody>
                       {report.thresholds.map((t) => (
-                        <tr key={`${t.year}-${t.action}`}>
+                        <tr key={`${t.year}-${t.action}-${t.metric}`}>
                           <td>{t.year}</td>
                           <td>{t.action}</td>
+                          <td>
+                            {t.metric === "first_entitlement_vector_change"
+                              ? "Any entitlement changes"
+                              : "Selected party seat changes"}
+                          </td>
                           <td>
                             {t.k !== null
                               ? number(t.k)
                               : t.status === "tie"
                                 ? `Tie at ${number(t.tieAt!)}`
                                 : "Not found within bound"}
+                          </td>
+                          <td>
+                            {t.selectedPartyDelta === undefined
+                              ? "—"
+                              : t.selectedPartyDelta > 0
+                                ? `+${t.selectedPartyDelta}`
+                                : t.selectedPartyDelta}
                           </td>
                           <td>{number(t.searchedThrough)}</td>
                         </tr>

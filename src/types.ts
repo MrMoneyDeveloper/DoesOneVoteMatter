@@ -14,7 +14,7 @@ export type Election = {
   parties: Party[];
   voteTotal: number;
   totals: Record<string, number>;
-  metrics: { effectiveParties: number; oneBallotWeightPP: number };
+  metrics: { effectiveParties: number; oneBallotWeightPP: number; smoothSeatEquivalent: number; averageBallotsPerSeat: number };
   anc: {
     share: number;
     votes: number;
@@ -73,13 +73,29 @@ export type Report = {
     status: string;
   }[];
   sources: Source[];
+  analysisUnit: string;
+  terminology: {
+    oneVoteMeaning: string;
+    voterBallotDistinction: string;
+  };
   thresholds: {
     year: number;
+    party: string;
     action: string;
+    metric: string;
+    criterion: string;
+    scope: string;
     k: number | null;
     searchedThrough: number;
     status: string;
     tieAt?: number;
+    selectedPartyDelta?: number;
+    changes?: {
+      party: string;
+      before: number;
+      after: number;
+      delta: number;
+    }[];
   }[];
   pivotality: {
     year: number;

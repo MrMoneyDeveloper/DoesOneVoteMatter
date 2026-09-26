@@ -20,7 +20,7 @@ const titles = [
   "Where did these numbers come from?",
   "Did one ballot change the allocation?",
   "Does meaningful electoral change need a decade?",
-  "What your argument gets right—and what remains open.",
+  "What the evidence establishes—and what remains open.",
 ];
 const labels = [
   "The question",
@@ -29,7 +29,7 @@ const labels = [
   "How the evidence was formed",
   "Individual influence",
   "Time and your life",
-  "The conclusion",
+  "Evidence status",
 ];
 const govt = "https://www.gov.za/about-government/national-assembly-na";
 const iec =
@@ -613,9 +613,16 @@ export default function ContextJourney({
           {step === 4 && (
             <>
               <p className="lesson-lead">
-                The narrow historical hypothesis is: adding, removing or
-                switching one ballot leaves the national seat allocation
-                unchanged. Any verified seat change would be a counterexample.
+                The narrow historical test asks whether adding, removing or
+                switching one counted ballot crosses a national seat-allocation
+                boundary in the realised result. Any verified seat change is a
+                counterexample.
+              </p>
+              <p className="lesson-insight">
+                In this report, “one vote” means one counted ballot unless a
+                voter-level scenario is explicitly labelled. That distinction
+                matters especially in 2024, when one voter could cast multiple
+                ballots.
               </p>
               <div className="influence-results">
                 <article>
@@ -635,13 +642,12 @@ export default function ContextJourney({
                 </article>
               </div>
               <div className="evidence-note">
-                <span>VERDICT ON INDIVIDUAL INFLUENCE</span>
-                <h2>Supported for the scenarios tested.</h2>
+                <span>OBSERVED RESULT</span>
+                <h2>No tested one-ballot perturbation changed the allocation.</h2>
                 <p>
-                  None of those single-ballot changes moved a seat. This
-                  supports a limited historical claim about individual influence
-                  on the allocation, not a measured probability for your next
-                  vote.
+                  This is a deterministic result for the historical scenarios
+                  tested. It is not an estimated probability that a future
+                  ballot will or will not be decisive.
                 </p>
               </div>
               <div className="gap-warning">
@@ -807,13 +813,14 @@ export default function ContextJourney({
           {step === 6 && (
             <>
               <p className="lesson-lead">
-                Your argument contains an empirical claim, a timing claim and a
-                personal judgment. They do not get the same verdict.
+                The original position contains an empirical claim, a timing
+                claim and a personal judgment. The evidence addresses them at
+                different levels.
               </p>
               <div className="verdict-rows">
                 <article>
                   <span className="verdict-tag">
-                    SUPPORTED WITHIN THE TESTS
+                    OBSERVED IN THE TESTS
                   </span>
                   <h2>“My one ballot did not change the national result.”</h2>
                   <p>
@@ -851,16 +858,16 @@ export default function ContextJourney({
                 </article>
               </div>
               <div className="lesson-conclusion">
-                <span>THE EVIDENCE-BASED CONCLUSION</span>
+                <span>WHAT THE CURRENT EVIDENCE ESTABLISHES</span>
                 <strong>
-                  Small observed individual influence. Uneven collective change.
+                  No observed single-ballot seat change in the tested scenarios. Uneven collective change.
                   No guaranteed personal benefit or waiting time.
                 </strong>
                 <p>
-                  The current data substantiates the narrow historical
-                  seat-impact claim. It does not substantiate the entire
-                  argument that participation can never be worthwhile, nor its
-                  opposite.
+                  The current data establishes a narrow historical seat-impact
+                  result within the tested counterfactuals. It does not establish
+                  that participation is or is not worthwhile, and it does not
+                  estimate future pivotality.
                 </p>
               </div>
               <div className="lesson-summary-actions">
@@ -892,7 +899,7 @@ export default function ContextJourney({
           <span>
             {step < titles.length - 1
               ? `Next: ${labels[step + 1]}`
-              : "Three claims. Three verdicts."}
+              : "Three claims. Three evidence statuses."}
           </span>
           <button
             className="btn"
