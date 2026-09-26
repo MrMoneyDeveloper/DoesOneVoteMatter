@@ -34,7 +34,9 @@ All 1,638 published regional party/candidate cells and 176 party compensatory ro
 
 Raw files are byte-pinned in `data-manifest.json`. Normal builds reject changed bytes. Original names and counts are retained. Uppercasing and whitespace normalization align identical names within an election; old parties are not merged into new parties. Source ID plus page/row is retained on records. Publisher totals are checked independently of calculated sums where present.
 
-## One vote and collective changes
+## One ballot and collective changes
+
+Unless a voter-level scenario is explicitly labelled, “one vote” in the interface means one counted ballot. This distinction matters in 2024 because one voter could cast multiple ballots. The current national counterfactual engine perturbs one counted national ballot while holding the observed regional ballot fixed.
 
 For party votes A and total V:
 
@@ -42,7 +44,7 @@ For party votes A and total V:
 - k party voters abstain: `(A-k)/(V-k)`.
 - Switch k from A to B: `(A-k)/V`, `(B+k)/V`.
 
-Party marginal effect is the counterfactual share minus `A/V`, multiplied by 100 to express **percentage points**. The ballot-weight quantity `100/V` is not the same as an added party vote's marginal share effect.
+Party marginal effect is the counterfactual share minus `A/V`, multiplied by 100 to express **percentage points**. The ballot-weight quantity `100/V` is not the same as an added party vote's marginal share effect. For scale only, the report also calculates a smooth proportional seat-equivalent of `400/V` seats per ballot and `V/400` average ballots per seat. These are continuous reference quantities, not claims that fractional seats are actually allocated.
 
 Strictly below 50% requires `2A' < V'`. For A initially at or above half:
 
@@ -52,7 +54,9 @@ Strictly below 50% requires `2A' < V'`. For A initially at or above half:
 
 2019 values: 1,307,786 switches; 2,615,572 additional opposition ballots; 2,615,572 ANC abstentions. These are vote-share thresholds, not seat-majority thresholds.
 
-Minimum entitlement-change searches exhaustively test k from 1 through 50,000 for ANC addition and abstention in 1994–2019. Search stops at the first change in any party's entitlement or at the first unresolved allocation tie. `not_found_within_bound` and `tie` have null k, never zero. No binary search is used: monotonicity is not assumed for the allocation method.
+Minimum threshold searches exhaustively test k from 1 through 50,000 for ANC addition and abstention in 1994–2019. Two metrics are published separately: `first_entitlement_vector_change`, the first point where any party entitlement changes, and `first_selected_party_seat_change`, the first point where the selected party's own entitlement changes. The engine also supports directional selected-party, majority-status and unique-largest-party criteria for future threshold mapping. Search stops at the first qualifying change or at the first unresolved allocation tie. `not_found_within_bound` and `tie` have null k, never zero. No binary search is used: monotonicity is not assumed for the allocation method.
+
+A regression test locks the counterintuitive 1994 ANC addition boundary: +17,256 ANC ballots preserves the reproduced entitlement vector, while +17,257 changes it from ANC 252 / AMP 0 to ANC 251 / AMP 1 under the validated entitlement algorithm. Because this looks paradoxical, the result is treated as an explicit algorithmic boundary case rather than silently generalized into a claim that more votes normally reduce a party's seats.
 
 ## Historical variation
 
@@ -60,7 +64,7 @@ ANC shares are recomputed from raw national counts. Training-period label refers
 
 The split is **retrospective**, selected after the 2024 result was public; it is not a prospective forecast or preregistered experiment. Six dependent, trending observations do not establish a normal distribution or a pivotality probability. No normal-tail probabilities, national significance tests or causality claims are shown.
 
-Initial hypothesis: individual ballots have small national outcome leverage at observed margins. Single-ballot changes, small verified thresholds, or many results at low k would weaken this descriptive hypothesis. No single-ballot change in the included calculations supports only a statement about those calculations. It cannot establish the philosophical or normative value of participation. This hypothesis statement was written during implementation, not prospectively before observing the historical results.
+Historical test: do one-ballot perturbations cross a national entitlement boundary in the realised election results? A verified seat change is a counterexample. No single-ballot change in the included calculations establishes only a deterministic statement about those tested states. It is not a future pivotality probability and cannot establish the philosophical or normative value of participation.
 
 ## Geography and future statistical analysis
 
