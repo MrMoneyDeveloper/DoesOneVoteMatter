@@ -1,0 +1,42 @@
+{
+  "name": "sa-electoral-impact-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "python -m unittest discover -s tests -v && tsx --test src/analytics/*.test.ts",
+    "data:download": "python -m pipeline.download",
+    "data:build": "python -m pipeline.build",
+    "verify": "npm run data:build && npm test && npm run build",
+    "deploy": "npm run verify && wrangler deploy",
+    "deploy:check": "npm run build && wrangler deploy --dry-run"
+  },
+  "dependencies": {
+    "@materializecss/materialize": "2.4.0",
+    "bootstrap": "5.3.8",
+    "d3": "7.9.0",
+    "echarts": "6.1.0",
+    "gsap": "3.15.0",
+    "handlebars": "4.7.9",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/d3": "7.4.3",
+    "@types/node": "26.6.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "autoprefixer": "10.6.1",
+    "postcss": "8.5.28",
+    "postcss-prefix-selector": "2.2.1",
+    "prettier": "3.9.9",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2",
+    "vite": "8.3.1",
+    "wrangler": "4.140.0"
+  }
+}

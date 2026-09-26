@@ -1,0 +1,58 @@
+[
+  {
+    "year": 1994,
+    "parties": 19,
+    "matched": 19,
+    "seats": 400,
+    "status": "passed",
+    "scope": "national_entitlement_no_overhang_no_list_exhaustion"
+  },
+  {
+    "year": 1999,
+    "parties": 16,
+    "matched": 16,
+    "seats": 400,
+    "status": "passed",
+    "scope": "national_entitlement_no_overhang_no_list_exhaustion"
+  },
+  {
+    "year": 2004,
+    "parties": 21,
+    "matched": 21,
+    "seats": 400,
+    "status": "passed",
+    "scope": "national_entitlement_no_overhang_no_list_exhaustion"
+  },
+  {
+    "year": 2009,
+    "parties": 26,
+    "matched": 26,
+    "seats": 400,
+    "status": "passed",
+    "scope": "national_entitlement_no_overhang_no_list_exhaustion"
+  },
+  {
+    "year": 2014,
+    "parties": 29,
+    "matched": 29,
+    "seats": 400,
+    "status": "passed",
+    "scope": "national_entitlement_no_overhang_no_list_exhaustion"
+  },
+  {
+    "year": 2019,
+    "parties": 48,
+    "matched": 48,
+    "seats": 400,
+    "status": "passed",
+    "scope": "national_entitlement_no_overhang_no_list_exhaustion"
+  },
+  {
+    "year": 2024,
+    "parties": 52,
+    "matched": 52,
+    "seats": 400,
+    "status": "passed",
+    "scope": "national_entitlement_no_overhang_no_list_exhaustion"
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "sourceId": "iec-1999-report",
+  "sourcePage": 74,
+  "printedPage": 78,
+  "table": "National Assembly",
+  "method": "Manual transcription from rendered scanned report; visually checked against all 16 rows. Votes are separately parsed from the IEC detailed XLS.",
+  "seats": {
+    "ABOLITION OF INCOME TAX AND USURY PARTY": 0,
+    "AFRICAN CHRISTIAN DEMOCRATIC PARTY": 6,
+    "AFRICAN NATIONAL CONGRESS": 266,
+    "AFRIKANER EENHEIDSBEWEGING": 1,
+    "AZANIAN PEOPLE'S ORGANISATION": 1,
+    "DEMOCRATIC PARTY": 38,
+    "FEDERAL ALLIANCE": 2,
+    "INKATHA FREEDOM PARTY": 34,
+    "MINORITY FRONT": 1,
+    "New National Party": 28,
+    "PAN AFRICANIST CONGRESS OF AZANIA": 3,
+    "The Government by the People Green Party": 0,
+    "THE SOCIALIST PARTY OF AZANIA": 0,
+    "UNITED CHRISTIAN DEMOCRATIC PARTY": 3,
+    "UNITED DEMOCRATIC MOVEMENT": 14,
+    "Vryheidsfront \\ Freedom Front": 3
+  }
+}
