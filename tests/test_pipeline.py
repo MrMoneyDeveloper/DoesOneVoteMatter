@@ -31,6 +31,22 @@ class OfficialReproduction(unittest.TestCase):
         self.assertEqual(result['AFRICAN CHRISTIAN DEMOCRATIC PARTY'],7)
         self.assertEqual(result["AZANIAN PEOPLE'S ORGANISATION"],1)
 
+    def test_1994_counterintuitive_threshold_is_regressed(self):
+        e=self.data[0]
+        votes=allocation_votes(e)
+        anc="ANC"
+        baseline=allocate(votes)
+        before=allocate(perturb(votes,anc,17256,"add"))
+        after=allocate(perturb(votes,anc,17257,"add"))
+        self.assertEqual(baseline[anc],252)
+        self.assertEqual(before,baseline)
+        self.assertEqual(after[anc],251)
+        self.assertEqual(after["AMP"],1)
+        vector=first_change(votes,anc,mechanism="add",limit=17257,criterion="vector")
+        party=first_change(votes,anc,mechanism="add",limit=17257,criterion="party_change")
+        self.assertEqual(vector["k"],17257)
+        self.assertEqual(party["k"],17257)
+
     def test_regional_and_compensatory_baselines(self):
         audits = [audit(e) for e in self.data]
         self.assertEqual([a['year'] for a in audits if a['status']=='passed'],[2004,2009,2014,2019,2024])
@@ -89,6 +105,7 @@ class Arithmetic(unittest.TestCase):
             with self.assertRaises(ValueError):allocate(v)
         with self.assertRaises(ValueError):perturb({"A":3},"A",4,"abstain")
         with self.assertRaises(ValueError):perturb({"A":3},"A",1,"switch","A")
+        with self.assertRaises(ValueError):first_change({"A":60,"B":40},"A",criterion="not-a-metric")
 
     def test_tie_is_not_arbitrary(self):
         with self.assertRaises(AllocationTie):allocate({"A":10,"B":10},1)
