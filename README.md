@@ -29,9 +29,9 @@ D3 draws regional ballot-area tiles and the historical seat timeline; GSAP anima
 - Independent calculation matching **every published national seat entitlement**, 2,800 seats across seven elections.
 - Python and TypeScript implementations tested against the same official fixtures and against each other for 422 additions/abstentions and 7,372 directed one-ballot switches.
 - Separate regional calculation matches 1,638 party/candidate-region cells and all compensatory seats for 2004–2024. Another 50,960 eligible one-ballot regional scenarios produce no regional seat changes or ties in these historical fixtures.
-- One-vote addition, abstention and directed switching; counterfactual slider; parliamentary majority status under the entitlement model.
+- One-ballot addition, abstention and directed switching; counterfactual slider; parliamentary majority status under the entitlement model. “One vote” means one counted ballot unless a voter-level scenario is explicitly labelled.
 - Exact vote-share thresholds, retrospective 1994–2019 mean/sample SD, 2024 holdout illustration, election swings, annualised swings, and province comparisons.
-- Bounded, exhaustive ANC entitlement-change searches (add/abstain, pre-2024, up to 50,000 ballots); ties reported explicitly.
+- Bounded, exhaustive ANC threshold searches (add/abstain, pre-2024, up to 50,000 ballots) now distinguish the first change anywhere in the entitlement vector from the first seat change of the selected party; ties are reported explicitly.
 - CSV and JSON downloads; source inspector; responsive layout and reduced-motion support.
 
 ## Scope and outstanding work
@@ -64,6 +64,11 @@ npm run build            # typecheck + production Vite bundle
 
 The first data build can take tens of seconds because minimum-threshold searches are exhaustive and do not assume that a remainder method is monotonic.
 
+
+## Continuous verification
+
+GitHub Actions runs the full offline verification suite on pushes and pull requests. The workflow rebuilds the report from the pinned source files, runs Python and TypeScript tests, type-checks the app and performs the production Vite build. This protects the published allocation claims from silently drifting when the engine changes.
+
 ## Cloudflare
 
 ```sh
@@ -72,11 +77,11 @@ npx wrangler login       # sign in to your intended Cloudflare account
 npm run deploy           # regenerate data, test, build, deploy
 ```
 
-No account or production deployment was created by this implementation. The app uses Workers Static Assets with SPA routing, following [Cloudflare's SPA configuration](https://developers.cloudflare.com/workers/static-assets/routing/single-page-application/). No Worker API, D1 or R2 is necessary for the current small exports. Raw data stays in the repository and is excluded from public assets. Add R2 only when bulky municipal or boundary data is ingested.
+The app uses Workers Static Assets with SPA routing, following [Cloudflare's SPA configuration](https://developers.cloudflare.com/workers/static-assets/routing/single-page-application/). A GitHub Actions deployment workflow will deploy pushes to `main` when repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are available; otherwise it verifies the build and explicitly skips the deployment step. No Worker API, D1 or R2 is necessary for the current small exports. Raw data stays in the repository and is excluded from public assets. Add R2 only when bulky municipal or boundary data is ingested.
 
 ## Data interpretation
 
-One ballot's weight (`100 / total valid votes`) differs from the change in a party's share when both numerator and denominator change. A historical outcome that is unchanged after one ballot is removed is not a probability estimate and does not establish whether someone should vote. Vote-share majority, largest-party status and parliamentary majority are separate questions.
+One ballot's weight (`100 / total valid votes`) differs from the change in a party's share when both numerator and denominator change. The report also exposes the smooth proportional seat-equivalent (`400 / total valid votes`) and average ballots per seat (`total valid votes / 400`) while keeping those continuous averages separate from the real discrete allocation. A historical outcome that is unchanged after one ballot is removed is not a probability estimate and does not establish whether someone should vote. Vote-share majority, largest-party status and parliamentary majority are separate questions.
 
 Source data retains its publishers' rights. The project claims no IEC affiliation or endorsement.
 
